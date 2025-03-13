@@ -25,17 +25,17 @@ class SignalServer {
         this.io.on("connection", (socket) => this.register(socket));
 
         this.io.of("/").adapter.on("create-room", (room) => {
-            console.log("room " + room + " was created");
+            console.log("Room " + room + " was created");
         });
 
         this.io.of("/").adapter.on("join-room", (room, id) => {
-            console.log("socket ID " + id + " joined room " + room);
+            console.log("socket [" + id + "] joined room " + room);
 
             this.sendEvent("join-room", this.io.to([room]), id, { room });
         });
 
         this.io.of("/").adapter.on("leave-room", (room, id) => {
-            console.log("socket ID " + id + " left room " + room);
+            console.log("socket [" + id + "] left room " + room);
 
             this.sendEvent("leave-room", this.io.to([room]), id, { room });
         });
@@ -48,7 +48,7 @@ class SignalServer {
     }
 
     register(socket) {
-        console.log("Socket ID " + socket.id + " connected.");
+        console.log("Socket [" + socket.id + "] connected");
 
         const client = {
             socket
@@ -56,8 +56,7 @@ class SignalServer {
         this.clients.push(client);
 
         socket.on("message", (data) => {
-
-            console.log("Message from socket ID " + socket.id + ":", data);
+            console.log(data.emitType + ": message type (" + data.message.type + ") from [" + socket.id + "]");
 
             switch (data.emitType) {
                 case "broadcast":
@@ -104,7 +103,7 @@ class SignalServer {
     }
 
     unregister(socket) {
-        console.log("Socket ID " + socket.id + " disconnected.");
+        console.log("Socket [" + socket.id + "] disconnected");
 
         const client = this.clients.find(client => client.socket == socket);
         this.clients.splice(this.clients.indexOf(client), 1);
